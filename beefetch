@@ -1,0 +1,52 @@
+# !/bin/bash
+
+UNDERLINE="\033[4m"
+RED="\033[1;31m"
+YELLOW="\033[1;33m"
+BLUE="\033[1;34m"
+WHITE="\033[1;37m"
+RESET="\033[0m"
+
+USER=$(whoami)
+HOSTNAME=$(hostname)
+OS=$(cat /etc/os-release | grep -E "^NAME=" | cut -d'"' -f2)
+KERNEL=$(uname -r)
+UPTIME=$(awk '{ 
+    days = int($1 / 86400); 
+    hours = int(($1 % 86400) / 3600); 
+    minutes = int(($1 % 3600) / 60); 
+    seconds = int($1 % 60);
+
+    if(days > 0) printf "%dd", days;
+    if(hours > 0 || days > 0) printf "%dh ", hours;
+    if(minutes > 0 || hours > 0 || days > 0) printf "%dm ", minutes;
+    printf "%ds\n", seconds
+}' /proc/uptime)
+RAM_USE=$(awk '/Active:/ {printf "%d MB", $2 / 1024}' /proc/meminfo)
+RAM_MAX=$(awk '/MemTotal:/ {printf "%d MB", $2 / 1024}' /proc/meminfo)
+WM=$XDG_SESSION_DESKTOP
+SERVER=$XDG_SESSION_TYPE
+
+BEE=(
+    "           "
+    "     __    "
+    "    // \\   "
+    "    \\\\\_/ / "
+    "  --(||)(${WHITE}'${YELLOW})"
+    "     '''   "
+    "           "
+)
+
+INFO=(
+    "${UNDERLINE}${BLUE}${USER}${RESET}@${UNDERLINE}${BLUE}${HOSTNAME}${RESET}"
+    "${RED}OS:${RESET} ${OS}"
+    "${RED}Kernel:${RESET} ${KERNEL}"
+    "${RED}Uptime:${RESET} ${UPTIME}"
+    "${RED}RAW:${RESET} ${RAM_USE} / ${RAM_MAX}"
+    "${RED}Window Manager:${RESET} ${WM}"
+    "${RED}Server:${RESET} ${SERVER}"
+)
+
+for i in "${!BEE[@]}"; do
+    printf "%b\t%b\n" "${YELLOW}${BEE[i]}${RESET}" "${INFO[i]:-}"
+done
