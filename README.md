@@ -8,4 +8,4 @@
 
 ## 🐝's
 
-@mirdukkkkk, @EtherCD
+[@mirdukkkkk](https://github.com/mirdukkkkk), [@EtherCD](https://github.com/EtherCD)
