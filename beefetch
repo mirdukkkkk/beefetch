@@ -9,7 +9,13 @@ RESET="\033[0m"
 
 USER=$(whoami)
 HOSTNAME=$(hostname)
-OS=$(cat /etc/os-release | grep -E "^NAME=" | cut -d'"' -f2)
+OS=$(
+    if [ -f /etc/os-release ]; then
+        grep -E "^NAME=" /etc/os-release | cut -d'"' -f2
+    else
+        echo "N/A"
+    fi
+)
 KERNEL=$(uname -r)
 UPTIME=$(awk '{ 
     days = int($1 / 86400); 
@@ -22,16 +28,16 @@ UPTIME=$(awk '{
     if(minutes > 0 || hours > 0 || days > 0) printf "%dm ", minutes;
     printf "%ds\n", seconds
 }' /proc/uptime)
-RAM_USE=$(awk '/Active:/ {printf "%d MB", $2 / 1024}' /proc/meminfo)
+RAM_USE=$(awk '/Active:/ {printf "%d MB", $2 / 1024}' /proc/meminfo || echo "N/A")
 RAM_MAX=$(awk '/MemTotal:/ {printf "%d MB", $2 / 1024}' /proc/meminfo)
-WM=$XDG_SESSION_DESKTOP
-SERVER=$XDG_SESSION_TYPE
+WM=$(ps -e | grep -E -o '2bwm|9wm|awesome|berry|blackbox|bspwm|cinnamon|compiz|cwm|dk|dwm|echinus|exwm|fluxbox|flwm|frankenwm|gala|herbstluftwm|i3|icewm|jwm|kwin|larswm|leftwm|lwm|marco|metacity|mlvwm|muffin|mutter|notion|openbox|openmotif|pawm|pekwm|qtile|ratpoison|sawfish|sowm|spectrwm|stumpwm|sway|tinywm|twm|ukwm|windowmaker|windwm|wingo|wm2|worm|xfwm4|xmonad|zwm' | head -n 1 || echo "N/A")
+SERVER=${XDG_SESSION_TYPE:-"tty"}
 
 BEE=(
     "           "
-    "     __    "
-    "    // \\   "
-    "    \\\\\_/ / "
+    "     ${WHITE}__    "
+    "    ${WHITE}// \\   "
+    "    ${WHITE}\\\\\_/ ${YELLOW}/ "
     "  --(||)(${WHITE}'${YELLOW})"
     "     '''   "
     "           "
@@ -48,5 +54,5 @@ INFO=(
 )
 
 for i in "${!BEE[@]}"; do
-    printf "%b\t%b\n" "${YELLOW}${BEE[i]}${RESET}" "${INFO[i]:-}"
+    printf "%b\t%b\n" "${YELLOW}${BEE[i]}${RESET}" "${INFO[i]}"
 done
