@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 
 UNDERLINE="\033[4m"
 RED="\033[1;31m"
