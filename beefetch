@@ -11,7 +11,17 @@ USER=$(whoami)
 HOSTNAME=$(hostname)
 OS=$(
     if [ -f /etc/os-release ]; then
-        grep -E "^NAME=" /etc/os-release | cut -d'"' -f2
+        PRETTY_NAME=$(grep -E "^PRETTY_NAME=" /etc/os-release | cut -d= -f2 | sed 's/^"//;s/"$//')
+        if [ -n "$PRETTY_NAME" ]; then
+            echo "$PRETTY_NAME"
+        else
+            NAME=$(grep -E "^NAME=" /etc/os-release | cut -d= -f2 | sed 's/^"//;s/"$//')
+            if [ -n "$NAME" ]; then
+                echo "$NAME"
+            else
+                echo "N/A"
+            fi
+        fi
     else
         echo "N/A"
     fi
