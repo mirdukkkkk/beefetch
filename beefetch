@@ -33,7 +33,7 @@ UPTIME=$(awk '{
     minutes = int(($1 % 3600) / 60); 
     seconds = int($1 % 60);
 
-    if(days > 0) printf "%dd", days;
+    if(days > 0) printf "%dd ", days;
     if(hours > 0 || days > 0) printf "%dh ", hours;
     if(minutes > 0 || hours > 0 || days > 0) printf "%dm ", minutes;
     printf "%ds\n", seconds
