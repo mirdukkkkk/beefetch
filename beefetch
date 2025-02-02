@@ -40,14 +40,14 @@ UPTIME=$(awk '{
 }' /proc/uptime)
 RAM_USE=$(awk '/Active:/ {printf "%d MB", $2 / 1024}' /proc/meminfo || echo "N/A")
 RAM_MAX=$(awk '/MemTotal:/ {printf "%d MB", $2 / 1024}' /proc/meminfo)
-WM=$(ps -e | grep -E -o '2bwm|9wm|awesome|berry|blackbox|bspwm|cinnamon|compiz|cwm|dk|dwm|echinus|exwm|fluxbox|flwm|frankenwm|gala|herbstluftwm|i3|icewm|jwm|kwin|larswm|leftwm|lwm|marco|metacity|mlvwm|muffin|mutter|notion|openbox|openmotif|pawm|pekwm|qtile|ratpoison|sawfish|sowm|spectrwm|stumpwm|sway|tinywm|twm|ukwm|windowmaker|windwm|wingo|wm2|worm|xfwm4|xmonad|zwm' | head -n 1 || echo "N/A")
+WM=$(ps -e | grep -E -o '2bwm|9wm|awesome|berry|blackbox|bspwm|cinnamon|compiz|cwm|dk|dwm|echinus|exwm|fluxbox|flwm|frankenwm|gala|herbstluftwm|i3|icewm|jwm|kwin|larswm|leftwm|lwm|marco|metacity|mlvwm|muffin|mutter|notion|openbox|openmotif|pawm|pekwm|qtile|ratpoison|sawfish|sowm|spectrwm|stumpwm|sway|tinywm|twm|ukwm|windowmaker|windwm|wingo|wm2|worm|xfwm4|xmonad|zwm' | { read wm || wm="N/A"; echo "$wm"; })
 SERVER=${XDG_SESSION_TYPE:-"tty"}
 
 BEE=(
     "           "
-    "     ${WHITE}__    "
-    "    ${WHITE}// \\   "
-    "    ${WHITE}\\\\\_/ ${YELLOW}/ "
+    "     ${WHITE}__${YELLOW}    "
+    "    ${WHITE}// \\\\${YELLOW}   "
+    "    ${WHITE}\\\\\_/${YELLOW} / "
     "  --(||)(${WHITE}'${YELLOW})"
     "     '''   "
     "           "
