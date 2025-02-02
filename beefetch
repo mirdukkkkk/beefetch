@@ -58,7 +58,7 @@ INFO=(
     "${RED}OS:${RESET} ${OS}"
     "${RED}Kernel:${RESET} ${KERNEL}"
     "${RED}Uptime:${RESET} ${UPTIME}"
-    "${RED}RAW:${RESET} ${RAM_USE} / ${RAM_MAX}"
+    "${RED}RAM:${RESET} ${RAM_USE} / ${RAM_MAX}"
     "${RED}Window Manager:${RESET} ${WM}"
     "${RED}Server:${RESET} ${SERVER}"
 )
