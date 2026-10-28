@@ -22,6 +22,26 @@ nix run github:mirdukkkkk/beefetch
 nix develop   # dev shell with cargo, clippy, rustfmt, rust-analyzer, hyperfine
 ```
 
+### Home Manager
+
+```nix
+# flake inputs
+beefetch.url = "github:mirdukkkkk/beefetch";
+
+# home configuration
+imports = [ inputs.beefetch.homeModules.default ];
+
+programs.beefetch = {
+  enable = true;
+  settings = {
+    fields = [ "os" "kernel" "uptime" "ram" "wm" "server" ];
+    color = true;
+  };
+};
+```
+
+The package is built from your own `pkgs`, so it does not pull in a second nixpkgs.
+
 ## Usage
 
 ```

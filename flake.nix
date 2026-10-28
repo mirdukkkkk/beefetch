@@ -15,6 +15,9 @@
     {
       overlays.default = final: _: { beefetch = final.callPackage ./package.nix { }; };
 
+      homeModules.default = ./hm-module.nix;
+      homeManagerModules = self.homeModules;
+
       packages = forAllSystems (pkgs: {
         beefetch = pkgs.callPackage ./package.nix { };
         default = self.packages.${pkgs.stdenv.hostPlatform.system}.beefetch;
