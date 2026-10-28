@@ -1,0 +1,16 @@
+[package]
+name = "beefetch"
+version = "3.0.0"
+edition = "2024"
+description = "Neofetch clone written in Rust with the ability to display 🐝"
+license = "GPL-3.0-only"
+repository = "https://github.com/mirdukkkkk/beefetch"
+
+[dependencies]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

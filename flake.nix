@@ -1,45 +1,38 @@
 {
   description = "beefetch - 🐝";
 
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-        };
-      in
-      {
-        packages.default = pkgs.buildGoModule {
-          pname = "beefetch";
-          version = "2.0.1";
+  outputs =
+    { self, nixpkgs }:
+    let
+      forAllSystems =
+        f:
+        nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" ] (
+          system: f nixpkgs.legacyPackages.${system}
+        );
+    in
+    {
+      overlays.default = final: _: { beefetch = final.callPackage ./package.nix { }; };
 
-          src = ./.;
+      packages = forAllSystems (pkgs: {
+        beefetch = pkgs.callPackage ./package.nix { };
+        default = self.packages.${pkgs.stdenv.hostPlatform.system}.beefetch;
+      });
 
-          vendorHash = null;
-
-          env = {
-            CGO_ENABLED = 0;
-          };
-          ldflags = [ "-s" "-w" ];
-
-          meta = {
-            description = "Neofetch clone written in Go with the ability to display 🐝";
-            homepage = "https://github.com/mirdukkkkk/beefetch";
-            license = pkgs.lib.licenses.gpl3Only;
-            mainProgram = "beefetch";
-          };
-        };
-
-        devShells.default = pkgs.mkShell {
-          packages = [
-            pkgs.go
+      devShells = forAllSystems (pkgs: {
+        default = pkgs.mkShell {
+          inputsFrom = [ self.packages.${pkgs.stdenv.hostPlatform.system}.beefetch ];
+          packages = with pkgs; [
+            clippy
+            rustfmt
+            rust-analyzer
+            hyperfine
           ];
+          RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
         };
-      }
-    );
+      });
+
+      formatter = forAllSystems (pkgs: pkgs.nixfmt);
+    };
 }

@@ -8,20 +8,26 @@
 
 ![🐝](docs/beefetch.png)
 
-## One-line Compilation
-
-Linux / macOS:
+## Build
 
 ```bash
-CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o beefetch ./cmd/beefetch
+cargo build --release
+# binary: target/release/beefetch
 ```
 
-Windows (PowerShell):
+### Nix
 
-```powershell
-$env:CGO_ENABLED=0
-go build -trimpath -ldflags="-s -w" -o beefetch.exe ./cmd/beefetch
+```bash
+nix run github:mirdukkkkk/beefetch
+nix develop   # dev shell with cargo, clippy, rustfmt, rust-analyzer, hyperfine
 ```
+
+## Go v2 vs Rust v3
+
+| | Go v2 | Rust v3 |
+|---|---|---|
+| Binary size | 2.1 MB | 316 KB |
+| Startup (`hyperfine -N`) | 1.5 ms | 0.66 ms |
 
 ## 🐝's
 
