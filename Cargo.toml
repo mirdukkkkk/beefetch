@@ -7,6 +7,11 @@ license = "GPL-3.0-only"
 repository = "https://github.com/mirdukkkkk/beefetch"
 
 [dependencies]
+bpaf = { version = "0.9.28", features = ["derive", "autocomplete"] }
+
+# Manpage rendering is only needed by the test that regenerates docs/beefetch.1.
+[dev-dependencies]
+bpaf = { version = "0.9.28", features = ["docgen"] }
 
 [profile.release]
 opt-level = "z"

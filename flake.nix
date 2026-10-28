@@ -22,8 +22,11 @@
 
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
-          inputsFrom = [ self.packages.${pkgs.stdenv.hostPlatform.system}.beefetch ];
+          # Listed explicitly instead of inputsFrom so the shell still works
+          # when the package itself fails to evaluate (e.g. missing Cargo.lock).
           packages = with pkgs; [
+            cargo
+            rustc
             clippy
             rustfmt
             rust-analyzer

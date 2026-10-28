@@ -3,7 +3,6 @@ use crate::info::Info;
 const UNDERLINE_BLUE: &str = "\x1b[4;1;34m";
 const RED: &str = "\x1b[1;31m";
 const YELLOW: &str = "\x1b[1;33m";
-const BLUE: &str = "\x1b[1;34m";
 const WHITE: &str = "\x1b[1;37m";
 const RESET: &str = "\x1b[0m";
 
@@ -65,22 +64,6 @@ pub fn render(info: &Info, color: bool) -> String {
         }
         out.push('\n');
     }
-
-    out
-}
-
-pub fn help(color: bool) -> String {
-    let mut out = String::with_capacity(256);
-
-    paint(&mut out, color, YELLOW, "beefetch");
-    out.push_str(" - neofetch clone written in Rust with 🐝\n\n");
-    paint(&mut out, color, BLUE, "Usage:");
-    out.push_str("\n  beefetch [options]\n\n");
-    paint(&mut out, color, BLUE, "Options:");
-    out.push_str(concat!(
-        "\n  -h, --help       Show this help message",
-        "\n  -n, --no-color   Disable ANSI colors (also NO_COLOR=1)\n",
-    ));
 
     out
 }
