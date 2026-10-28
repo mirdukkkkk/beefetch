@@ -4,12 +4,23 @@
 .SH NAME
 \fRbeefetch \- \fP\fRNeofetch clone written in Rust with 🐝\fP
 .SH SYNOPSIS
-\fBbeefetch\fP\fR \fP\fR[\fP\fB\-n\fP\fR]\fP
+\fBbeefetch\fP\fR \fP\fR[\fP\fB\-n\fP\fR] [\fP\fB\-f\fP\fR=\fP\fILIST\fP\fR] [\fP\fB\-c\fP\fR=\fP\fIPATH\fP\fR]\fP
 .PP
 .SS AVAILABLE\ OPTIONS:
 .TP
 \fB\-n\fP\fR, \fP\fB\-\-no\-color\fP
 \fRDisable ANSI colors (also NO_COLOR=1)\fP
+.PP
+.TP
+\fB\-f\fP\fR, \fP\fB\-\-fields\fP\fR=\fP\fILIST\fP
+\fRFields to show, in order: os, kernel, uptime, ram, wm, server\fP
+.PP
+.TP
+\fB\-c\fP\fR, \fP\fB\-\-config\fP\fR=\fP\fIPATH\fP
+\fRConfig file [default: $XDG_CONFIG_HOME/beefetch/config]\fP
+.PP
+.TP
+\fRUses environment variable \fP\fBBEEFETCH_CONFIG\fP
 .PP
 .TP
 \fB\-h\fP\fR, \fP\fB\-\-help\fP

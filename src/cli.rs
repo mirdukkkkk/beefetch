@@ -1,4 +1,8 @@
+use std::path::PathBuf;
+
 use bpaf::Bpaf;
+
+use crate::info::{self, Field};
 
 /// Neofetch clone written in Rust with 🐝
 #[derive(Debug, Clone, Bpaf)]
@@ -7,6 +11,14 @@ pub struct Args {
     /// Disable ANSI colors (also NO_COLOR=1)
     #[bpaf(short, long, long("nocolor"))]
     pub no_color: bool,
+
+    /// Fields to show, in order: os, kernel, uptime, ram, wm, server
+    #[bpaf(short, long, argument::<String>("LIST"), parse(|s| info::parse_fields(&s)), optional)]
+    pub fields: Option<Vec<Field>>,
+
+    /// Config file [default: $XDG_CONFIG_HOME/beefetch/config]
+    #[bpaf(short, long, env("BEEFETCH_CONFIG"), argument("PATH"))]
+    pub config: Option<PathBuf>,
 }
 
 #[cfg(test)]
@@ -25,6 +37,15 @@ mod tests {
             assert!(parse(&[flag]).unwrap().no_color, "{flag}");
         }
         assert!(parse(&["--bogus"]).is_err());
+    }
+
+    #[test]
+    fn fields_are_validated() {
+        assert_eq!(
+            parse(&["-f", "ram,os"]).unwrap().fields,
+            Some(vec![Field::Ram, Field::Os])
+        );
+        assert!(parse(&["--fields", "cpu"]).unwrap_err().contains("`cpu`"));
     }
 
     #[test]

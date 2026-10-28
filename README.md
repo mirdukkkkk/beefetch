@@ -22,6 +22,28 @@ nix run github:mirdukkkkk/beefetch
 nix develop   # dev shell with cargo, clippy, rustfmt, rust-analyzer, hyperfine
 ```
 
+## Usage
+
+```
+beefetch [-n] [-f LIST] [-c PATH]
+
+-n, --no-color     Disable ANSI colors (also NO_COLOR=1)
+-f, --fields LIST  Fields to show, in order: os, kernel, uptime, ram, wm, server
+-c, --config PATH  Config file (also BEEFETCH_CONFIG)
+```
+
+## Config
+
+`$XDG_CONFIG_HOME/beefetch/config` (usually `~/.config/beefetch/config`):
+
+```
+# fields to show, in order
+fields = os, kernel, uptime, ram, wm, server
+color = true
+```
+
+Command-line flags override the config.
+
 ## Go v2 vs Rust v3
 
 | | Go v2 | Rust v3 |

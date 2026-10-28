@@ -1,55 +1,118 @@
+use std::str::FromStr;
 use std::{env, fs};
 
 const NA: &str = "N/A";
 
-pub struct Info {
-    pub user: String,
-    pub host: String,
-    pub os: String,
-    pub kernel: String,
-    pub uptime: String,
-    pub ram: String,
-    pub wm: String,
-    pub server: String,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Field {
+    Os,
+    Kernel,
+    Uptime,
+    Ram,
+    Wm,
+    Server,
 }
 
-impl Info {
-    pub fn collect() -> Self {
-        Self {
-            user: env_var("USER")
-                .or_else(user_from_passwd)
-                .unwrap_or_else(|| NA.into()),
-            host: read_trimmed("/proc/sys/kernel/hostname")
-                .or_else(|| read_trimmed("/etc/hostname"))
-                .unwrap_or_else(|| NA.into()),
-            os: fs::read_to_string("/etc/os-release")
-                .or_else(|_| fs::read_to_string("/usr/lib/os-release"))
-                .ok()
-                .and_then(|s| pretty_name(&s))
-                .unwrap_or_else(|| "Linux".into()),
-            kernel: read_trimmed("/proc/sys/kernel/osrelease").unwrap_or_else(|| NA.into()),
-            uptime: fs::read_to_string("/proc/uptime")
-                .ok()
-                .and_then(|s| uptime(&s))
-                .unwrap_or_else(|| NA.into()),
-            ram: fs::read_to_string("/proc/meminfo")
-                .ok()
-                .and_then(|s| ram(&s))
-                .unwrap_or_else(|| NA.into()),
-            wm: env_var("XDG_CURRENT_DESKTOP")
-                .or_else(|| env_var("DESKTOP_SESSION"))
-                .unwrap_or_else(|| {
-                    if env_var("WAYLAND_DISPLAY").is_some() {
-                        "Wayland".into()
-                    } else if env_var("DISPLAY").is_some() {
-                        "X11".into()
-                    } else {
-                        NA.into()
-                    }
-                }),
-            server: env_var("XDG_SESSION_TYPE").unwrap_or_else(|| "tty".into()),
+impl Field {
+    pub const ALL: [Field; 6] = [
+        Field::Os,
+        Field::Kernel,
+        Field::Uptime,
+        Field::Ram,
+        Field::Wm,
+        Field::Server,
+    ];
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Field::Os => "os",
+            Field::Kernel => "kernel",
+            Field::Uptime => "uptime",
+            Field::Ram => "ram",
+            Field::Wm => "wm",
+            Field::Server => "server",
         }
     }
+
+    pub fn label(self) -> &'static str {
+        match self {
+            Field::Os => "OS:",
+            Field::Kernel => "Kernel:",
+            Field::Uptime => "Uptime:",
+            Field::Ram => "RAM:",
+            Field::Wm => "WM:",
+            Field::Server => "Server:",
+        }
+    }
+
+    pub fn collect(self) -> String {
+        let value = match self {
+            Field::Os => {
+                return fs::read_to_string("/etc/os-release")
+                    .or_else(|_| fs::read_to_string("/usr/lib/os-release"))
+                    .ok()
+                    .and_then(|s| pretty_name(&s))
+                    .unwrap_or_else(|| "Linux".into());
+            }
+            Field::Kernel => read_trimmed("/proc/sys/kernel/osrelease"),
+            Field::Uptime => fs::read_to_string("/proc/uptime")
+                .ok()
+                .and_then(|s| uptime(&s)),
+            Field::Ram => fs::read_to_string("/proc/meminfo")
+                .ok()
+                .and_then(|s| ram(&s)),
+            Field::Wm => env_var("XDG_CURRENT_DESKTOP")
+                .or_else(|| env_var("DESKTOP_SESSION"))
+                .or_else(|| {
+                    if env_var("WAYLAND_DISPLAY").is_some() {
+                        Some("Wayland".into())
+                    } else if env_var("DISPLAY").is_some() {
+                        Some("X11".into())
+                    } else {
+                        None
+                    }
+                }),
+            Field::Server => {
+                return env_var("XDG_SESSION_TYPE").unwrap_or_else(|| "tty".into());
+            }
+        };
+        value.unwrap_or_else(|| NA.into())
+    }
+}
+
+impl FromStr for Field {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Field::ALL
+            .into_iter()
+            .find(|f| f.name().eq_ignore_ascii_case(s))
+            .ok_or_else(|| {
+                let names: Vec<_> = Field::ALL.iter().map(|f| f.name()).collect();
+                format!("unknown field `{s}`, expected one of: {}", names.join(", "))
+            })
+    }
+}
+
+/// Parses a comma-separated field list; empty items are ignored.
+pub fn parse_fields(list: &str) -> Result<Vec<Field>, String> {
+    list.split(',')
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(str::parse)
+        .collect()
+}
+
+pub fn user() -> String {
+    env_var("USER")
+        .or_else(user_from_passwd)
+        .unwrap_or_else(|| NA.into())
+}
+
+pub fn host() -> String {
+    read_trimmed("/proc/sys/kernel/hostname")
+        .or_else(|| read_trimmed("/etc/hostname"))
+        .unwrap_or_else(|| NA.into())
 }
 
 fn env_var(key: &str) -> Option<String> {
@@ -150,5 +213,15 @@ mod tests {
         let s = "MemTotal:       32782336 kB\nMemFree:  1000 kB\nMemAvailable:   19060736 kB\n";
         assert_eq!(ram(s).as_deref(), Some("13400 MiB / 32014 MiB"));
         assert_eq!(ram("MemTotal: 1024 kB\n"), None);
+    }
+
+    #[test]
+    fn field_list_parsing() {
+        assert_eq!(
+            parse_fields(" RAM, os ,,kernel"),
+            Ok(vec![Field::Ram, Field::Os, Field::Kernel])
+        );
+        assert_eq!(parse_fields(""), Ok(vec![]));
+        assert!(parse_fields("os,cpu").unwrap_err().contains("`cpu`"));
     }
 }
