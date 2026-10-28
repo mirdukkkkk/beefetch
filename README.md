@@ -8,6 +8,10 @@
 
 ![🐝](docs/beefetch.png)
 
+## Download
+
+Static Linux binaries (amd64, 386, arm64, armv7, armv6) are attached to every [release](https://github.com/mirdukkkkk/beefetch/releases).
+
 ## Build
 
 ```bash
