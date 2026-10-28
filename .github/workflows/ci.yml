@@ -11,10 +11,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked
+
+  nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - run: nix flake check
+      - run: nix build --print-build-logs
 
   build:
     needs: test
@@ -28,7 +39,7 @@ jobs:
           - { target: armv7-unknown-linux-musleabihf, name: linux-armv7 }
           - { target: arm-unknown-linux-musleabihf, name: linux-armv6 }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: taiki-e/install-action@v2
         with:
           tool: cross
@@ -47,7 +58,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # checkout turns annotated tags into lightweight ones; refetch to keep the message.
       - run: git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
         env:
