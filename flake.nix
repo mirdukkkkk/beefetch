@@ -1,7 +1,7 @@
 {
   description = "beefetch - 🐝";
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-26.11";
 
   outputs =
     { self, nixpkgs }:
